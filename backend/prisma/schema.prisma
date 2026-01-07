@@ -5,10 +5,86 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  
+}
+
+model EventType {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  duration    Int
+  slug        String    @unique
+  color       String    @default("#3b82f6")
+  isActive    Boolean   @default(true)
+  bufferTime  Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  bookings    Booking[]
+  questions   CustomQuestion[]
+}
+
+model Availability {
+  id        Int      @id @default(autoincrement())
+  dayOfWeek Int
+  startTime String
+  endTime   String
+  timezone  String   @default("UTC")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DateOverride {
+  id        Int      @id @default(autoincrement())
+  date      DateTime
+  isBlocked Boolean  @default(false)
+  startTime String?
+  endTime   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Booking {
+  id          Int       @id @default(autoincrement())
+  eventTypeId Int
+  eventType   EventType @relation(fields: [eventTypeId], references: [id], onDelete: Cascade)
+  name        String
+  email       String
+  date        DateTime
+  startTime   String
+  endTime     String
+  timezone    String    @default("UTC")
+  status      String    @default("confirmed")
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  answers     BookingAnswer[]
+}
+
+model CustomQuestion {
+  id          Int       @id @default(autoincrement())
+  eventTypeId Int
+  eventType   EventType @relation(fields: [eventTypeId], references: [id], onDelete: Cascade)
+  question    String
+  type        String    @default("text")
+  required    Boolean   @default(false)
+  options     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  answers     BookingAnswer[]
+}
+
+model BookingAnswer {
+  id         Int            @id @default(autoincrement())
+  bookingId  Int
+  booking    Booking        @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  questionId Int
+  question   CustomQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answer     String
+  createdAt  DateTime       @default(now())
 }
