@@ -2,13 +2,13 @@
 
 A modern, full-stack calendar scheduling application inspired by Cal.com. Built with React, Node.js, and PostgreSQL, this system allows users to create event types, manage availability, accept bookings through public links, and provides comprehensive booking management tools.
 
-## 📋 Live Demo
+## Live Demo
 
 **Application:** [Your Deployment Link Here]
 
-⚠️ **Note:** The backend is deployed on a free tier service, which may experience cold starts. If the application seems slow initially, please wait 30-60 seconds for the backend services to spin up.
+**Note:** The backend is deployed on a free tier service, which may experience cold starts. If the application seems slow initially, please wait 30-60 seconds for the backend services to spin up.
 
-## 🔐 Demo Credentials (For Testing)
+## Demo Credentials (For Testing)
 
 **Admin/User Access:**
 - Email: `demo@example.com`
@@ -20,7 +20,7 @@ A modern, full-stack calendar scheduling application inspired by Cal.com. Built 
 - View bookings at `/bookings`
 - Test public booking at `/book/[event-slug]`
 
-## 📚 API Documentation
+## API Documentation
 
 **API Documentation:** Complete API documentation with interactive examples
 
@@ -30,7 +30,7 @@ The full API documentation is available after starting the server:
 
 **Note:** Make sure your server is running locally at `http://localhost:3000`.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 - **React** - UI library
@@ -48,7 +48,7 @@ The full API documentation is available after starting the server:
 - **Nodemailer** - Email notifications
 - **CORS** - Cross-origin resource sharing
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 scaler_assignment/
@@ -94,7 +94,7 @@ scaler_assignment/
 └── README.md
 ```
 
-## 🗄️ Database Schema
+## Database Schema
 
 The application uses PostgreSQL with Prisma ORM. The database consists of the following main entities:
 
@@ -124,7 +124,7 @@ The application uses PostgreSQL with Prisma ORM. The database consists of the fo
 - Bookings reference EventTypes
 - Each Booking has a unique time slot
 
-## 🚀 Local Development Setup
+## Local Development Setup
 
 ### Prerequisites
 
@@ -246,7 +246,7 @@ The frontend application will be available at `http://localhost:5173`
 2. You should see the calendar booking application
 3. Navigate through the sidebar to test different features
 
-## ✨ Key Features
+## Key Features
 
 ### User Features
 
@@ -272,7 +272,7 @@ The frontend application will be available at `http://localhost:5173`
 - **Time Slot Display** - 12h/24h format support with visual indicators
 - **Form Validation** - Client and server-side validation
 
-## 🔐 Authentication
+## Authentication
 
 The application currently operates without authentication, making it ideal for single-user or demo purposes. For production use, consider implementing:
 
@@ -281,7 +281,7 @@ The application currently operates without authentication, making it ideal for s
 - Role-based access control
 - Multi-user support with user-specific data
 
-## 🎨 UI/UX Features
+## UI/UX Features
 
 - **Dark Theme** - Modern dark color scheme (black, zinc-900, zinc-800)
 - **Reusable Components** - Modal, Calendar, and TimeSlotPicker components
@@ -290,7 +290,7 @@ The application currently operates without authentication, making it ideal for s
 - **Loading States** - Visual feedback during API calls
 - **Error Handling** - User-friendly error messages
 
-## 📧 Email Notifications
+## Email Notifications
 
 The application sends email notifications for:
 - New booking confirmations
@@ -300,7 +300,7 @@ The application sends email notifications for:
 
 Configure SMTP settings in the backend `.env` file to enable email functionality.
 
-## 🚀 Deployment
+## Deployment
 
 ### Backend Deployment (Railway/Render)
 
@@ -316,7 +316,7 @@ Configure SMTP settings in the backend `.env` file to enable email functionality
 3. Set `VITE_API_BASE_URL` to your backend URL
 4. Deploy the frontend application
 
-## 🧪 Testing
+## Testing
 
 To test the application:
 
@@ -341,19 +341,19 @@ To test the application:
    - Test reschedule functionality
    - Test cancel functionality
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions, issues, and feature requests are welcome! Feel free to check the issues page.
 
-## 👨‍💻 Developer
+## Developer
 
 Built by **Shubham Sharma**
 
-## 📞 Support
+## Support
 
 For support, email shubhamsharma@example.com or open an issue in the repository.
 
