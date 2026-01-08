@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import EventTypes from './pages/EventTypes';
-// import Bookings from './pages/Bookings';
+import Bookings from './pages/Bookings';
 import Availability from './pages/Availability';
 // import PublicBooking from './pages/PublicBooking';
 // import BookingConfirmation from './pages/BookingConfirmation';
