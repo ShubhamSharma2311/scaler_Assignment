@@ -1,5 +1,6 @@
 const prisma = require('../config/database');
 const moment = require('moment-timezone');
+const { sendBookingConfirmation, sendCancellationEmail } = require('../services/emailService');
 
 const getAllBookings = async (req, res) => {
   try {
@@ -194,6 +195,14 @@ const createBooking = async (req, res) => {
       }
     });
     
+    // Send confirmation emails
+    try {
+      await sendBookingConfirmation(booking, booking.eventType);
+    } catch (emailError) {
+      console.error('Failed to send confirmation email:', emailError);
+      // Don't fail the booking if email fails
+    }
+    
     res.status(201).json(booking);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -209,6 +218,14 @@ const cancelBooking = async (req, res) => {
       data: { status: 'cancelled' },
       include: { eventType: true }
     });
+    
+    // Send cancellation emails
+    try {
+      await sendCancellationEmail(booking, booking.eventType);
+    } catch (emailError) {
+      console.error('Failed to send cancellation email:', emailError);
+      // Don't fail the cancellation if email fails
+    }
     
     res.json(booking);
   } catch (error) {
