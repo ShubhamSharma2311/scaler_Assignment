@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
+import { Toaster } from 'react-hot-toast';
 import EventTypes from './pages/EventTypes';
 import Bookings from './pages/Bookings';
 import Availability from './pages/Availability';
@@ -9,6 +10,29 @@ import BookingConfirmation from './pages/BookingConfirmation';
 function App() {
   return (
     <Router>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#18181b',
+            color: '#fff',
+            border: '1px solid #27272a',
+          },
+          success: {
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
       <Routes>
         <Route path="/book/:slug" element={<PublicBooking />} />
         <Route path="/confirmation/:id" element={<BookingConfirmation />} />

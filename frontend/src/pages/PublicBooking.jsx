@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { api } from '../services/api';
 import moment from 'moment-timezone';
 import Calendar from '../components/Calendar';
@@ -78,7 +79,7 @@ export default function PublicBooking() {
     if (eventType.questions && eventType.questions.length > 0) {
       for (const question of eventType.questions) {
         if (question.required && !questionAnswers[question.id]) {
-          alert(`Please answer the required question: ${question.question}`);
+          toast.error(`Please answer the required question: ${question.question}`);
           return;
         }
       }
@@ -106,7 +107,7 @@ export default function PublicBooking() {
       navigate(`/confirmation/${result.id}`);
     } catch (error) {
       setSubmitting(false);
-      alert('Failed to create booking. This time slot may no longer be available.');
+      toast.error('Failed to create booking. This time slot may no longer be available.');
       console.error('Error creating booking:', error);
     }
   };

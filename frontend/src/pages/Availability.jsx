@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { api } from '../services/api';
 import Modal from '../components/Modal';
 
@@ -100,9 +101,9 @@ export default function Availability() {
       });
       
       await api.availability.bulkUpdate({ availabilities });
-      alert('Availability saved successfully!');
+      toast.success('Availability saved successfully!');
     } catch (error) {
-      alert('Failed to save availability');
+      toast.error('Failed to save availability');
       console.error('Error saving availability:', error);
     }
   };
@@ -116,7 +117,7 @@ export default function Availability() {
       setShowOverrideModal(false);
       setOverrideData({ date: '', isBlocked: false, startTime: '09:00', endTime: '17:00' });
     } catch (error) {
-      alert('Failed to add date override');
+      toast.error('Failed to add date override');
       console.error('Error adding date override:', error);
     }
   };
@@ -128,7 +129,7 @@ export default function Availability() {
         const overridesData = await api.dateOverrides.getAll();
         setDateOverrides(overridesData);
       } catch (error) {
-        alert('Failed to delete date override');
+        toast.error('Failed to delete date override');
         console.error('Error deleting date override:', error);
       }
     }

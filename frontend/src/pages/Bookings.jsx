@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { api } from '../services/api';
 import moment from 'moment-timezone';
 import Modal from '../components/Modal';
@@ -39,16 +40,16 @@ export default function Bookings() {
       const data = await api.bookings.getAll({ type: filter });
       setBookings(data);
       
-      alert('Booking cancelled successfully!');
+      toast.success('Booking cancelled successfully!');
     } catch (error) {
-      alert('Failed to cancel booking');
+      toast.error('Failed to cancel booking');
       console.error('Error cancelling booking:', error);
     }
   };
 
   const handleReschedule = async () => {
     if (!selectedDate || !selectedSlot) {
-      alert('Please select a date and time');
+      toast.error('Please select a date and time');
       return;
     }
 
@@ -67,9 +68,9 @@ export default function Bookings() {
       const data = await api.bookings.getAll({ type: filter });
       setBookings(data);
       
-      alert('Booking rescheduled successfully!');
+      toast.success('Booking rescheduled successfully!');
     } catch (error) {
-      alert('Failed to reschedule booking');
+      toast.error('Failed to reschedule booking');
       console.error('Error rescheduling booking:', error);
     }
   };
