@@ -4,7 +4,7 @@ A modern, full-stack calendar scheduling application inspired by Cal.com. Built 
 
 ## Live Demo
 
-**Application:** [scaler-assignment-eta.vercel.app]
+**Application:** [[LINK](https://scaler-assignment-eta.vercel.app/)]
 
 **Note:** The backend is deployed on a free tier service, which may experience cold starts. If the application seems slow initially, please wait 30-60 seconds for the backend services to spin up.
 
