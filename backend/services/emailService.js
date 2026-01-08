@@ -11,14 +11,29 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_APP_PASSWORD
+  },
+  secure: true,
+  tls: {
+    rejectUnauthorized: false
   }
 });
 
 // Verify transporter configuration
 if (process.env.EMAIL_USER && process.env.EMAIL_APP_PASSWORD) {
   transporter.verify()
-    .then(() => console.log('Email service is ready'))
-    .catch(error => console.error('Email service configuration error:', error.message));
+    .then(() => {
+      console.log('✅ Email service is ready');
+      console.log('Email configured with:', process.env.EMAIL_USER);
+    })
+    .catch(error => {
+      console.error('❌ Email service configuration error:', error.message);
+      console.error('Full error:', error);
+      console.log('Please check:');
+      console.log('1. EMAIL_USER is set correctly');
+      console.log('2. EMAIL_APP_PASSWORD is a valid 16-character app password');
+      console.log('3. 2-Factor Authentication is enabled on your Gmail account');
+      console.log('4. Less secure app access is disabled (use app password instead)');
+    });
 }
 
 const formatDate = (date) => {
@@ -203,24 +218,31 @@ const sendBookingConfirmation = async (booking, eventType) => {
   
   try {
     // Send email to guest
+    console.log(`Sending confirmation email to ${booking.email}...`);
     await transporter.sendMail({
       from: `"Scheduling Platform" <${process.env.EMAIL_USER}>`,
       to: booking.email,
       subject: `Booking Confirmed: ${eventType.title} on ${bookingDate}`,
       html: guestEmailHtml
     });
+    console.log(`✅ Guest email sent to ${booking.email}`);
     
     // Send email to owner
+    console.log(`Sending notification email to owner ${process.env.OWNER_EMAIL}...`);
     await transporter.sendMail({
       from: `"Scheduling Platform" <${process.env.EMAIL_USER}>`,
       to: process.env.OWNER_EMAIL,
       subject: `New Booking: ${eventType.title} - ${booking.name}`,
       html: ownerEmailHtml
     });
+    console.log(`✅ Owner email sent to ${process.env.OWNER_EMAIL}`);
     
-    console.log('Booking confirmation emails sent successfully');
+    console.log('✅ All booking confirmation emails sent successfully');
   } catch (error) {
-    console.error('Error sending emails:', error);
+    console.error('❌ Error sending booking confirmation emails:', error.message);
+    console.error('Error code:', error.code);
+    console.error('Error response:', error.response);
+    console.error('Full error:', error);
     throw error;
   }
 };
