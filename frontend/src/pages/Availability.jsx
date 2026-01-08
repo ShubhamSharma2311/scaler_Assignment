@@ -141,13 +141,13 @@ export default function Availability() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Availability</h1>
-        <p className="text-gray-600 mt-2">Configure times when you are available for bookings.</p>
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Availability</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">Configure times when you are available for bookings.</p>
       </div>
 
-      <div className="bg-white rounded-lg border p-6 mb-6">
+      <div className="bg-white rounded-lg border p-4 sm:p-6 mb-4 sm:mb-6">
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
           <select
@@ -249,31 +249,39 @@ export default function Availability() {
 
         <div className="space-y-2">
           {dateOverrides.map((override) => (
-            <div key={override.id} className="flex items-center justify-between p-3 border rounded-lg">
-              <div>
-                <div className="font-medium">
-                  {new Date(override.date).toLocaleDateString('en-US', { 
-                    weekday: 'short', 
-                    year: 'numeric', 
-                    month: 'short', 
-                    day: 'numeric' 
-                  })}
+            <div key={override.id} className="p-3 border rounded-lg">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                  <div className="font-medium">
+                    {new Date(override.date).toLocaleDateString('en-US', { 
+                      weekday: 'short', 
+                      year: 'numeric', 
+                      month: 'short', 
+                      day: 'numeric' 
+                    })}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {override.isBlocked ? (
+                      <span className="text-red-600">Blocked</span>
+                    ) : (
+                      <span>{override.startTime} - {override.endTime}</span>
+                    )}
+                  </div>
                 </div>
-                <div className="text-sm text-gray-600">
-                  {override.isBlocked ? (
-                    <span className="text-red-600">Blocked</span>
-                  ) : (
-                    <span>{override.startTime} - {override.endTime}</span>
-                  )}
-                </div>
+                <button
+                  onClick={() => handleDeleteOverride(override.id)}
+                  className="hidden sm:block text-red-600 hover:text-red-800 p-1"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
               </div>
               <button
                 onClick={() => handleDeleteOverride(override.id)}
-                className="text-red-600 hover:text-red-800 p-1"
+                className="sm:hidden w-full mt-2 px-3 py-2 text-sm text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
+                Delete Override
               </button>
             </div>
           ))}

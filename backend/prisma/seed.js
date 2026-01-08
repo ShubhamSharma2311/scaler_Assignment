@@ -22,55 +22,21 @@ async function main() {
 
   const eventType1 = await prisma.eventType.create({
     data: {
-      title: '30 Minute Meeting',
-      description: 'A quick 30-minute meeting to discuss your project, goals, or any questions you may have.',
+      title: '30 Min Interview',
+      description: 'A quick 30-minute interview to discuss your background and experience.',
       duration: 30,
-      slug: '30-min-meeting',
+      slug: '30-min-interview',
       color: '#3b82f6',
-      bufferTime: 0,
-      questions: {
-        create: [
-          {
-            question: 'What would you like to discuss?',
-            type: 'text',
-            required: true
-          }
-        ]
-      }
+      bufferTime: 0
     }
   });
 
   const eventType2 = await prisma.eventType.create({
     data: {
-      title: '60 Minute Consultation',
-      description: 'An in-depth 60-minute consultation session for detailed discussions and planning.',
-      duration: 60,
-      slug: '60-min-consultation',
-      color: '#8b5cf6',
-      bufferTime: 15,
-      questions: {
-        create: [
-          {
-            question: 'What is your company name?',
-            type: 'text',
-            required: false
-          },
-          {
-            question: 'How did you hear about us?',
-            type: 'text',
-            required: false
-          }
-        ]
-      }
-    }
-  });
-
-  const eventType3 = await prisma.eventType.create({
-    data: {
-      title: '15 Minute Quick Call',
-      description: 'A brief 15-minute call for quick questions or introductions.',
+      title: 'Quick Chat',
+      description: 'A brief 15-minute call for quick questions.',
       duration: 15,
-      slug: '15-min-quick-call',
+      slug: 'quick-chat',
       color: '#10b981',
       bufferTime: 5
     }
@@ -93,52 +59,17 @@ async function main() {
   tomorrow.setDate(tomorrow.getDate() + 1);
   tomorrow.setHours(0, 0, 0, 0);
 
-  const dayAfterTomorrow = new Date();
-  dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
-  dayAfterTomorrow.setHours(0, 0, 0, 0);
-
-  const nextWeek = new Date();
-  nextWeek.setDate(nextWeek.getDate() + 7);
-  nextWeek.setHours(0, 0, 0, 0);
-
   await prisma.booking.create({
     data: {
       eventTypeId: eventType1.id,
       name: 'John Doe',
-      email: 'john.doe@example.com',
+      email: 'john@example.com',
       date: tomorrow,
       startTime: '10:00',
       endTime: '10:30',
       timezone: 'UTC',
       status: 'confirmed',
-      notes: 'Looking forward to discussing the new project proposal.'
-    }
-  });
-
-  await prisma.booking.create({
-    data: {
-      eventTypeId: eventType2.id,
-      name: 'Jane Smith',
-      email: 'jane.smith@example.com',
-      date: dayAfterTomorrow,
-      startTime: '14:00',
-      endTime: '15:00',
-      timezone: 'UTC',
-      status: 'confirmed',
-      notes: 'Need consultation on website redesign.'
-    }
-  });
-
-  await prisma.booking.create({
-    data: {
-      eventTypeId: eventType3.id,
-      name: 'Mike Johnson',
-      email: 'mike.johnson@example.com',
-      date: nextWeek,
-      startTime: '11:00',
-      endTime: '11:15',
-      timezone: 'UTC',
-      status: 'confirmed'
+      notes: 'Looking forward to the meeting.'
     }
   });
 
@@ -148,15 +79,14 @@ async function main() {
 
   await prisma.booking.create({
     data: {
-      eventTypeId: eventType1.id,
-      name: 'Sarah Williams',
-      email: 'sarah.williams@example.com',
+      eventTypeId: eventType2.id,
+      name: 'Jane Smith',
+      email: 'jane@example.com',
       date: yesterday,
-      startTime: '13:00',
-      endTime: '13:30',
+      startTime: '14:00',
+      endTime: '14:15',
       timezone: 'UTC',
-      status: 'confirmed',
-      notes: 'Past booking for testing.'
+      status: 'confirmed'
     }
   });
 
@@ -169,18 +99,6 @@ async function main() {
     data: {
       date: blockedDate,
       isBlocked: true
-    }
-  });
-
-  const customHoursDate = new Date();
-  customHoursDate.setDate(customHoursDate.getDate() + 10);
-
-  await prisma.dateOverride.create({
-    data: {
-      date: customHoursDate,
-      isBlocked: false,
-      startTime: '10:00',
-      endTime: '14:00'
     }
   });
 

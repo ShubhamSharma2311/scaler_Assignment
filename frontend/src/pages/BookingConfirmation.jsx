@@ -51,9 +51,9 @@ export default function BookingConfirmation() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-2xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-sm border p-8">
+    <div className="min-h-screen bg-gray-50 py-10">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-lg shadow-sm border p-6 sm:p-8">
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -69,9 +69,9 @@ export default function BookingConfirmation() {
           <div className="border-t border-b py-6 space-y-6">
             <div>
               <h2 className="text-sm font-medium text-gray-500 mb-2">Event Type</h2>
-              <div className="flex items-center space-x-3">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-2 sm:space-y-0">
                 <div className="w-1 h-12 rounded" style={{ backgroundColor: booking.eventType?.color || '#3b82f6' }}></div>
-                <div>
+                <div className="space-y-1">
                   <p className="font-semibold text-gray-900">{booking.eventType?.title || 'Event'}</p>
                   {booking.eventType?.description && (
                     <p className="text-sm text-gray-600">{booking.eventType.description}</p>
@@ -82,14 +82,14 @@ export default function BookingConfirmation() {
 
             <div>
               <h2 className="text-sm font-medium text-gray-500 mb-2">Date & Time</h2>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2 text-gray-900">
+              <div className="space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-2 sm:space-y-0 text-gray-900">
                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   <span className="font-medium">{formatDate(booking.date)}</span>
                 </div>
-                <div className="flex items-center space-x-2 text-gray-900">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-2 sm:space-y-0 text-gray-900">
                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -101,14 +101,14 @@ export default function BookingConfirmation() {
 
             <div>
               <h2 className="text-sm font-medium text-gray-500 mb-2">Your Details</h2>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
+              <div className="space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">
                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                   <span className="text-gray-900">{booking.name}</span>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">
                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
@@ -142,7 +142,7 @@ export default function BookingConfirmation() {
         </div>
 
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-start space-x-3">
+          <div className="flex flex-col sm:flex-row items-start gap-3">
             <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>

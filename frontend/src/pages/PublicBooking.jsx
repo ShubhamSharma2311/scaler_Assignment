@@ -121,25 +121,25 @@ export default function PublicBooking() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-sm border p-8 mb-8">
-          <div className="flex items-start space-x-4">
-            <div className="w-2 h-20 rounded" style={{ backgroundColor: eventType.color }}></div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">{eventType.title}</h1>
+    <div className="min-h-screen bg-gray-50 py-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-lg shadow-sm border p-6 sm:p-8 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:space-x-4 space-y-4 sm:space-y-0">
+            <div className="w-2 h-14 sm:h-20 rounded" style={{ backgroundColor: eventType.color }}></div>
+            <div className="space-y-3">
+              <h1 className="text-3xl font-bold text-gray-900 leading-tight">{eventType.title}</h1>
               {eventType.description && (
-                <p className="text-gray-600 mt-2">{eventType.description}</p>
+                <p className="text-gray-600">{eventType.description}</p>
               )}
-              <div className="flex items-center space-x-4 mt-4 text-sm text-gray-500">
-                <div className="flex items-center space-x-1">
+              <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
+                <div className="flex items-center space-x-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <span>{eventType.duration} minutes</span>
                 </div>
                 {eventType.bufferTime > 0 && (
-                  <div className="flex items-center space-x-1">
+                  <div className="flex items-center space-x-2">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
@@ -151,14 +151,14 @@ export default function PublicBooking() {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <div className="flex justify-between items-center mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+          <div className="bg-white rounded-lg shadow-sm border p-5 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
               <h2 className="text-xl font-semibold text-gray-900">Select a Date</h2>
               <div className="flex space-x-2">
                 <button
                   onClick={() => setCurrentMonth(currentMonth.clone().subtract(1, 'month'))}
-                  className="p-2 hover:bg-gray-100 rounded"
+                  className="p-2 hover:bg-gray-100 rounded-lg"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -166,7 +166,7 @@ export default function PublicBooking() {
                 </button>
                 <button
                   onClick={() => setCurrentMonth(currentMonth.clone().add(1, 'month'))}
-                  className="p-2 hover:bg-gray-100 rounded"
+                  className="p-2 hover:bg-gray-100 rounded-lg"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -214,7 +214,7 @@ export default function PublicBooking() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border p-6">
+          <div className="bg-white rounded-lg shadow-sm border p-5 sm:p-6">
             {!selectedDate ? (
               <div className="text-center py-12">
                 <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,7 +237,7 @@ export default function PublicBooking() {
                     <p className="text-gray-500">No available times for this date</p>
                   </div>
                 ) : (
-                  <div className="space-y-2 mb-6 max-h-64 overflow-y-auto">
+                  <div className="space-y-2 mb-6 max-h-64 sm:max-h-72 overflow-y-auto">
                     {availableSlots.map((slot, index) => (
                       <button
                         key={index}
@@ -257,7 +257,7 @@ export default function PublicBooking() {
                 )}
 
                 {selectedSlot && (
-                  <form onSubmit={handleSubmit} className="space-y-4 border-t pt-6">
+                  <form onSubmit={handleSubmit} className="space-y-4 border-t pt-5 sm:pt-6">
                     <h3 className="font-semibold text-gray-900">Enter Details</h3>
                     
                     <div>

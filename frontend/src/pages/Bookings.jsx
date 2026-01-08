@@ -111,10 +111,10 @@ export default function Bookings() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Bookings</h1>
-        <p className="text-gray-600 mt-2">See upcoming and past events booked through your event type links.</p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Bookings</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">See upcoming and past events booked through your event type links.</p>
       </div>
 
       <div className="mb-6">
@@ -159,24 +159,24 @@ export default function Bookings() {
           </div>
         ) : (
           bookings.map((booking) => (
-            <div key={booking.id} className="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <div className="w-1 h-16 rounded" style={{ backgroundColor: booking.eventType?.color || '#3b82f6' }}></div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">
+            <div key={booking.id} className="bg-white border rounded-lg p-4 sm:p-6 hover:shadow-md transition-shadow">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start space-x-3 mb-2">
+                    <div className="w-1 h-16 rounded flex-shrink-0" style={{ backgroundColor: booking.eventType?.color || '#3b82f6' }}></div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 break-words">
                         {booking.eventType?.title || 'Event'}
                       </h3>
-                      <div className="text-sm text-gray-600 mt-1">
+                      <div className="text-sm text-gray-600 mt-1 space-y-1">
                         <div className="flex items-center space-x-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
-                          <span>{formatDate(booking.date)}</span>
+                          <span className="truncate">{formatDate(booking.date)}</span>
                         </div>
-                        <div className="flex items-center space-x-2 mt-1">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="flex items-center space-x-2">
+                          <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                           <span>{formatTime(booking.startTime)} - {formatTime(booking.endTime)}</span>
@@ -186,18 +186,18 @@ export default function Bookings() {
                     </div>
                   </div>
 
-                  <div className="ml-4 mt-3 space-y-1">
+                  <div className="ml-4 mt-3 space-y-1.5">
                     <div className="flex items-center space-x-2 text-sm">
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
-                      <span className="text-gray-700">{booking.name}</span>
+                      <span className="text-gray-700 truncate">{booking.name}</span>
                     </div>
                     <div className="flex items-center space-x-2 text-sm">
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
-                      <span className="text-gray-700">{booking.email}</span>
+                      <span className="text-gray-700 break-all">{booking.email}</span>
                     </div>
                     {booking.notes && (
                       <div className="flex items-start space-x-2 text-sm mt-2">
@@ -216,10 +216,33 @@ export default function Bookings() {
                       </span>
                     </div>
                   )}
+
+                  {booking.status !== 'cancelled' && filter === 'upcoming' && (
+                    <div className="flex items-center gap-2 mt-3 sm:hidden">
+                      <button
+                        onClick={() => {
+                          setRescheduleModal(booking);
+                          setSelectedDate(null);
+                          setSelectedSlot(null);
+                          setAvailableSlots([]);
+                          setCurrentMonth(moment());
+                        }}
+                        className="flex-1 px-3 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                      >
+                        Reschedule
+                      </button>
+                      <button
+                        onClick={() => handleCancel(booking.id)}
+                        className="flex-1 px-3 py-2 text-sm text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {booking.status !== 'cancelled' && filter === 'upcoming' && (
-                  <div className="flex space-x-2 ml-4">
+                  <div className="hidden sm:flex space-x-2 self-start ml-4">
                     <button
                       onClick={() => {
                         setRescheduleModal(booking);
@@ -228,7 +251,7 @@ export default function Bookings() {
                         setAvailableSlots([]);
                         setCurrentMonth(moment());
                       }}
-                      className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                      className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       title="Reschedule booking"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,7 +260,7 @@ export default function Bookings() {
                     </button>
                     <button
                       onClick={() => handleCancel(booking.id)}
-                      className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                      className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       title="Cancel booking"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

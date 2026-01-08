@@ -109,10 +109,10 @@ export default function EventTypes() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Event Types</h1>
-          <p className="text-gray-600 mt-2">Create events to share for people to book on your calendar.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Event Types</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">Create events to share for people to book on your calendar.</p>
         </div>
         <button
           onClick={() => {
@@ -120,29 +120,47 @@ export default function EventTypes() {
             setFormData({ title: '', description: '', duration: 30, slug: '', color: '#3b82f6', bufferTime: 0 });
             setShowModal(true);
           }}
-          className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800"
+          className="bg-black text-white px-4 py-2 sm:px-6 rounded-lg hover:bg-gray-800 text-sm sm:text-base whitespace-nowrap self-start sm:self-auto"
         >
           + New Event Type
         </button>
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-3 sm:gap-4">
         {eventTypes.map((event) => (
-          <div key={event.id} className="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-1 h-16 rounded" style={{ backgroundColor: event.color }}></div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{event.title}</h3>
-                  <p className="text-gray-600 text-sm mt-1">{event.description}</p>
-                  <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
-                    <span>{event.duration} min</span>
-                    {event.bufferTime > 0 && <span>Buffer: {event.bufferTime} min</span>}
-                    <span className="text-blue-600">/{event.slug}</span>
-                  </div>
+          <div key={event.id} className="bg-white border rounded-lg p-4 sm:p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <div className="w-1 h-14 sm:h-16 rounded flex-shrink-0" style={{ backgroundColor: event.color }}></div>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 break-words">{event.title}</h3>
+                <p className="text-gray-600 text-xs sm:text-sm mt-1 break-words">{event.description}</p>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs sm:text-sm text-gray-500">
+                  <span>{event.duration} min</span>
+                  {event.bufferTime > 0 && <span>Buffer: {event.bufferTime} min</span>}
+                  <span className="text-blue-600 break-all">/{event.slug}</span>
+                </div>
+                <div className="flex items-center gap-2 mt-3 sm:hidden">
+                  <button
+                    onClick={() => copyLink(event.slug)}
+                    className="flex-1 px-3 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  >
+                    Copy Link
+                  </button>
+                  <button
+                    onClick={() => handleEdit(event)}
+                    className="flex-1 px-3 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(event.id)}
+                    className="px-3 py-2 text-sm text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="hidden sm:flex items-start space-x-1 flex-shrink-0">
                 <button
                   onClick={() => copyLink(event.slug)}
                   className="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded"
@@ -177,8 +195,8 @@ export default function EventTypes() {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-4 sm:p-6 lg:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <h2 className="text-2xl font-bold mb-6">
               {editingEvent ? 'Edit Event Type' : 'Create New Event Type'}
             </h2>
