@@ -325,6 +325,24 @@ For support, email shubhamsharma@example.com or open an issue in the repository.
 - Custom booking questions with validation
 - Color-coded event types for visual organization
 
+## Email Notifications (Technical Note)
+
+Email notifications are implemented using Gmail SMTP.
+
+### Current Behaviour
+- Email delivery works correctly in local development
+- Email delivery may be restricted in the deployed environment
+
+### Reason
+Many cloud hosting providers (including Render free tier) restrict outbound SMTP traffic to prevent spam and abuse. As a result, SMTP-based email delivery may be blocked in production environments.
+
+### Production Recommendation
+For production use, API-based email services (such as Resend, SendGrid, or AWS SES) should be used instead of SMTP. These services operate over HTTPS and are not affected by SMTP port restrictions.
+
+### Note
+Email notifications are listed as a bonus feature in the assignment. Core scheduling and booking functionality remains fully operational regardless of email delivery.
+
+
 ## Database Schema
 
 The application uses PostgreSQL with the following models:
