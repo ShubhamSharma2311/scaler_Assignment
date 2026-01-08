@@ -1,14 +1,14 @@
-// Environment variable should be set in Vercel dashboard
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-if (!API_BASE_URL) {
-  throw new Error('VITE_API_BASE_URL environment variable is not set');
-}
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://scaler-assignment-0zpl.onrender.com/api';
 
 export const api = {
   eventTypes: {
     getAll: () => fetch(`${API_BASE_URL}/event-types`).then(res => res.json()),
-    getBySlug: (slug) => fetch(`${API_BASE_URL}/event-types/${slug}`).then(res => res.json()),
+    getBySlug: (slug) => {
+      if (!slug || slug === 'undefined') {
+        return Promise.reject(new Error('Invalid slug'));
+      }
+      return fetch(`${API_BASE_URL}/event-types/${slug}`).then(res => res.json());
+    },
     create: (data) => fetch(`${API_BASE_URL}/event-types`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
