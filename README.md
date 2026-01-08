@@ -345,36 +345,36 @@ Email notifications are listed as a bonus feature in the assignment. Core schedu
 
 ## Database Schema
 
-The application uses PostgreSQL with the following models:
+The application uses PostgreSQL with Prisma ORM. Below is the visual representation of the database structure:
 
-### EventType
-- Stores event type information (title, description, duration, slug, color, buffer time)
-- Has relationships with Booking and CustomQuestion
+![Database Schema Diagram](./frontend/src/assets/db_diagram.png)
 
-### Availability
-- Stores weekly availability schedule
-- Defines available days and time ranges
-- Supports timezone configuration
+The database consists of the following main entities:
 
-### DateOverride
-- Allows blocking specific dates
-- Enables custom hours for specific dates
-- Overrides default availability settings
+### Core Entities
 
-### Booking
-- Stores all booking information
-- Links to EventType
-- Contains guest details and booking status
-- Related to BookingAnswer for custom questions
+**EventType** - Event configuration and metadata
+- id, title, description, duration, slug, color, bufferTime
+- Custom questions support
 
-### CustomQuestion
-- Stores custom questions for event types
-- Supports different question types (text, textarea, number)
-- Configurable as required or optional
+**Availability** - User's weekly schedule
+- id, userId, dayOfWeek, startTime, endTime, timezone
+- Multiple time slots per day
 
-### BookingAnswer
-- Stores answers to custom questions
-- Links booking responses to questions
+**DateOverride** - Exceptions to regular availability
+- id, date, isBlocked, startTime, endTime
+- Block specific dates or set custom hours
+
+**Booking** - User reservations
+- id, eventTypeId, name, email, date, startTime, endTime
+- Status tracking and notes
+
+### Key Relationships
+- EventTypes can have multiple Bookings
+- Availability rules apply to EventTypes
+- DateOverrides modify Availability
+- Bookings reference EventTypes
+- Each Booking has a unique time slot
 
 ## License
 
