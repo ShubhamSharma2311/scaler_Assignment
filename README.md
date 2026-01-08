@@ -362,18 +362,7 @@ The application uses PostgreSQL with the following models:
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Contributing
-
-Contributions, issues, and feature requests are welcome! Feel free to check the issues page.
-
 ## Developer
 
 Built by **Shubham Sharma**
 
-## Support
-
-For support, email shubhamsharma@example.com or open an issue in the repository.
-
----
-
-**Last updated:** January 2026
