@@ -233,43 +233,43 @@ export default function EventTypes() {
       </div>
 
       <Modal isOpen={showModal} maxWidth="max-w-2xl">
-        <div className="bg-white rounded-lg p-4 sm:p-6 lg:p-8 w-full">
-          <h2 className="text-2xl font-bold mb-6">
+        <div className="p-4 sm:p-6 lg:p-8 w-full">
+          <h2 className="text-2xl font-bold mb-6 text-white">
             {editingEvent ? 'Edit Event Type' : 'Create New Event Type'}
           </h2>
             <form onSubmit={handleSubmit}>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Title *</label>
                   <input
                     type="text"
                     required
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="30 Minute Meeting"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Description</label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     rows="3"
                     placeholder="A quick meeting to discuss..."
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">URL Slug *</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">URL Slug *</label>
                   <input
                     type="text"
                     required
                     value={formData.slug}
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="30-min-meeting"
                   />
                   <p className="text-xs text-gray-500 mt-1">This will be used in the booking URL</p>
@@ -277,47 +277,47 @@ export default function EventTypes() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Duration (minutes) *</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Duration (minutes) *</label>
                     <input
                       type="number"
                       required
                       min="5"
                       value={formData.duration}
                       onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Buffer Time (minutes)</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Buffer Time (minutes)</label>
                     <input
                       type="number"
                       min="0"
                       value={formData.bufferTime}
                       onChange={(e) => setFormData({ ...formData, bufferTime: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Color</label>
                   <input
                     type="color"
                     value={formData.color}
                     onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                    className="w-20 h-10 border rounded cursor-pointer"
+                    className="w-20 h-10 bg-zinc-800 border border-zinc-700 rounded cursor-pointer"
                   />
                 </div>
               </div>
 
-              <div className="mt-6 pt-6 border-t">
+              <div className="mt-6 pt-6 border-t border-zinc-800">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Custom Questions</h3>
+                  <h3 className="text-lg font-semibold text-white">Custom Questions</h3>
                   <button
                     type="button"
                     onClick={addQuestion}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                    className="text-sm text-blue-500 hover:text-blue-400 font-medium"
                   >
                     + Add Question
                   </button>
@@ -328,7 +328,7 @@ export default function EventTypes() {
                 ) : (
                   <div className="space-y-4">
                     {customQuestions.map((q, index) => (
-                      <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                      <div key={index} className="border border-zinc-800 rounded-lg p-4 bg-zinc-800/50">
                         <div className="flex justify-between items-start mb-3">
                           <div className="flex-1 mr-4">
                             <input
@@ -336,13 +336,13 @@ export default function EventTypes() {
                               value={q.question}
                               onChange={(e) => updateQuestion(index, 'question', e.target.value)}
                               placeholder="Enter your question"
-                              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                              className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500"
                             />
                           </div>
                           <button
                             type="button"
                             onClick={() => removeQuestion(index)}
-                            className="text-red-600 hover:text-red-700"
+                            className="text-red-500 hover:text-red-400"
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -353,7 +353,7 @@ export default function EventTypes() {
                           <select
                             value={q.type}
                             onChange={(e) => updateQuestion(index, 'type', e.target.value)}
-                            className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                            className="px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
                           >
                             <option value="text">Text</option>
                             <option value="textarea">Long Text</option>
@@ -364,9 +364,9 @@ export default function EventTypes() {
                               type="checkbox"
                               checked={q.required}
                               onChange={(e) => updateQuestion(index, 'required', e.target.checked)}
-                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                              className="w-4 h-4 text-blue-600 bg-zinc-900 border-zinc-700 rounded focus:ring-blue-500"
                             />
-                            <span className="text-sm text-gray-700">Required</span>
+                            <span className="text-sm text-gray-300">Required</span>
                           </label>
                         </div>
                       </div>
@@ -382,13 +382,13 @@ export default function EventTypes() {
                     setShowModal(false);
                     setEditingEvent(null);
                   }}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                  className="px-4 py-2 text-gray-300 bg-zinc-800 rounded-lg hover:bg-zinc-700"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
+                  className="px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-100"
                 >
                   {editingEvent ? 'Update' : 'Create'}
                 </button>
