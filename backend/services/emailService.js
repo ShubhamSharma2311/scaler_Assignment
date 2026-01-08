@@ -7,26 +7,31 @@ if (!process.env.EMAIL_USER || !process.env.EMAIL_APP_PASSWORD) {
 }
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false, // Use STARTTLS
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_APP_PASSWORD
   },
-  secure: true,
   tls: {
-    rejectUnauthorized: false
-  }
+    rejectUnauthorized: false,
+    ciphers: 'SSLv3'
+  },
+  connectionTimeout: 10000, // 10 seconds
+  greetingTimeout: 10000,
+  socketTimeout: 10000
 });
 
 // Verify transporter configuration
 if (process.env.EMAIL_USER && process.env.EMAIL_APP_PASSWORD) {
   transporter.verify()
     .then(() => {
-      console.log('✅ Email service is ready');
+      console.log(' Email service is ready');
       console.log('Email configured with:', process.env.EMAIL_USER);
     })
     .catch(error => {
-      console.error('❌ Email service configuration error:', error.message);
+      console.error(' Email service configuration error:', error.message);
       console.error('Full error:', error);
       console.log('Please check:');
       console.log('1. EMAIL_USER is set correctly');
