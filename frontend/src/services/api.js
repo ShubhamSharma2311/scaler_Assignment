@@ -1,5 +1,9 @@
-// Replace this URL with your actual Render backend URL
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://your-backend.onrender.com/api';
+// Environment variable should be set in Vercel dashboard
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+if (!API_BASE_URL) {
+  throw new Error('VITE_API_BASE_URL environment variable is not set');
+}
 
 export const api = {
   eventTypes: {
