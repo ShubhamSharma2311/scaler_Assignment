@@ -62,7 +62,7 @@ export default function BookingConfirmation() {
             </div>
             <h1 className="text-3xl font-bold text-white mb-2">Booking Confirmed!</h1>
             <p className="text-gray-400">
-              Your booking has been successfully confirmed. You will receive a confirmation email shortly.
+              Your booking has been successfully confirmed.
             </p>
           </div>
 
@@ -149,10 +149,38 @@ export default function BookingConfirmation() {
             <div className="flex-1">
               <h3 className="text-sm font-medium text-white mb-1">What's Next?</h3>
               <ul className="text-sm text-gray-400 space-y-1">
-                <li>Check your email for the meeting confirmation</li>
                 <li>Add the event to your calendar</li>
                 <li>Prepare any materials you might need</li>
               </ul>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 bg-amber-900/20 border border-amber-800/50 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <svg className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-amber-400 mb-2">Email Notification Status</h3>
+              <div className="text-sm text-gray-300 space-y-2">
+                <p className="font-medium">
+                  If you're testing locally: <span className="text-white">Check your email for confirmation</span>
+                </p>
+                <p className="font-medium">
+                  If you're using the deployed version: <span className="text-amber-400">Email delivery may be restricted</span>
+                </p>
+                <div className="mt-3 pt-3 border-t border-amber-800/30">
+                  <p className="text-xs text-gray-400 leading-relaxed">
+                    <span className="font-medium text-gray-300">Why?</span> Free hosting providers restrict SMTP (email) ports to prevent spam. 
+                    Email works perfectly in local development, but may be blocked in deployed environments.
+                  </p>
+                  <p className="text-xs text-gray-400 mt-2">
+                    <span className="font-medium text-gray-300">Production Solution:</span> API-based email services (Resend, SendGrid, AWS SES) 
+                    should be used instead of SMTP as they operate over HTTPS and aren't affected by port restrictions.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
