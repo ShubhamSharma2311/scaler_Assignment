@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import moment from 'moment-timezone';
 
 export default function PublicBooking() {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const [eventType, setEventType] = useState(null);
   const [currentMonth, setCurrentMonth] = useState(moment());
   const [selectedDate, setSelectedDate] = useState(null);
@@ -88,11 +89,8 @@ export default function PublicBooking() {
         notes: formData.notes
       };
 
-      await api.bookings.create(bookingData);
-      alert('Booking created successfully!');
-      setFormData({ name: '', email: '', notes: '' });
-      setSelectedDate(null);
-      setSelectedSlot(null);
+      const result = await api.bookings.create(bookingData);
+      navigate(`/confirmation/${result.id}`);
     } catch (error) {
       alert('Failed to create booking. This time slot may no longer be available.');
       console.error('Error creating booking:', error);

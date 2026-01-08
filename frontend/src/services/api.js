@@ -33,6 +33,7 @@ export const api = {
       const query = new URLSearchParams(params).toString();
       return fetch(`${API_BASE_URL}/bookings?${query}`).then(res => res.json());
     },
+    getById: (id) => fetch(`${API_BASE_URL}/bookings/${id}`).then(res => res.json()),
     getSlots: (params) => {
       const query = new URLSearchParams(params).toString();
       return fetch(`${API_BASE_URL}/bookings/slots?${query}`).then(res => res.json());
