@@ -14,6 +14,7 @@ export default function PublicBooking() {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [timeFormat, setTimeFormat] = useState('12h'); // '12h' or '24h'
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -71,7 +72,7 @@ export default function PublicBooking() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedDate || !selectedSlot) return;
+    if (!selectedDate || !selectedSlot || submitting) return;
 
     // Validate required custom questions
     if (eventType.questions && eventType.questions.length > 0) {
@@ -82,6 +83,8 @@ export default function PublicBooking() {
         }
       }
     }
+
+    setSubmitting(true);
 
     try {
       const bookingData = {
@@ -102,6 +105,7 @@ export default function PublicBooking() {
       const result = await api.bookings.create(bookingData);
       navigate(`/confirmation/${result.id}`);
     } catch (error) {
+      setSubmitting(false);
       alert('Failed to create booking. This time slot may no longer be available.');
       console.error('Error creating booking:', error);
     }
@@ -233,9 +237,10 @@ export default function PublicBooking() {
 
             <button
               type="submit"
-              className="w-full bg-white text-black py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+              disabled={submitting}
+              className="w-full bg-white text-black py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Confirm Booking
+              {submitting ? 'Confirming...' : 'Confirm Booking'}
             </button>
           </form>
         </div>

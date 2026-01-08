@@ -1,6 +1,11 @@
 const nodemailer = require('nodemailer');
 const moment = require('moment-timezone');
 
+// Validate email configuration
+if (!process.env.EMAIL_USER || !process.env.EMAIL_APP_PASSWORD) {
+  console.warn('Email service not configured. EMAIL_USER and EMAIL_APP_PASSWORD environment variables are required.');
+}
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -8,6 +13,13 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_APP_PASSWORD
   }
 });
+
+// Verify transporter configuration
+if (process.env.EMAIL_USER && process.env.EMAIL_APP_PASSWORD) {
+  transporter.verify()
+    .then(() => console.log('Email service is ready'))
+    .catch(error => console.error('Email service configuration error:', error.message));
+}
 
 const formatDate = (date) => {
   return moment(date).format('dddd, MMMM D, YYYY');

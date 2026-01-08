@@ -163,12 +163,35 @@ const createBooking = async (req, res) => {
   try {
     const { eventTypeId, name, email, date, startTime, endTime, timezone, notes, answers } = req.body;
     
+    // More precise check for existing bookings - check for overlapping time slots
     const existingBooking = await prisma.booking.findFirst({
       where: {
         eventTypeId,
         date: new Date(date),
-        startTime,
-        status: { not: 'cancelled' }
+        status: { not: 'cancelled' },
+        OR: [
+          // Check if new booking starts during an existing booking
+          {
+            AND: [
+              { startTime: { lte: startTime } },
+              { endTime: { gt: startTime } }
+            ]
+          },
+          // Check if new booking ends during an existing booking
+          {
+            AND: [
+              { startTime: { lt: endTime } },
+              { endTime: { gte: endTime } }
+            ]
+          },
+          // Check if new booking completely overlaps an existing booking
+          {
+            AND: [
+              { startTime: { gte: startTime } },
+              { endTime: { lte: endTime } }
+            ]
+          }
+        ]
       }
     });
     
@@ -201,16 +224,14 @@ const createBooking = async (req, res) => {
       }
     });
     
-    // Send confirmation emails
-    try {
-      await sendBookingConfirmation(booking, booking.eventType);
-    } catch (emailError) {
-      console.error('Failed to send confirmation email:', emailError);
-      // Don't fail the booking if email fails
-    }
+    // Send confirmation emails asynchronously
+    sendBookingConfirmation(booking, booking.eventType)
+      .then(() => console.log('Booking confirmation emails sent successfully'))
+      .catch(emailError => console.error('Failed to send confirmation email:', emailError));
     
     res.status(201).json(booking);
   } catch (error) {
+    console.error('Booking creation error:', error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -225,16 +246,14 @@ const cancelBooking = async (req, res) => {
       include: { eventType: true }
     });
     
-    // Send cancellation emails
-    try {
-      await sendCancellationEmail(booking, booking.eventType);
-    } catch (emailError) {
-      console.error('Failed to send cancellation email:', emailError);
-      // Don't fail the cancellation if email fails
-    }
+    // Send cancellation emails asynchronously
+    sendCancellationEmail(booking, booking.eventType)
+      .then(() => console.log('Cancellation emails sent successfully'))
+      .catch(emailError => console.error('Failed to send cancellation email:', emailError));
     
     res.json(booking);
   } catch (error) {
+    console.error('Booking cancellation error:', error);
     res.status(500).json({ error: error.message });
   }
 };
