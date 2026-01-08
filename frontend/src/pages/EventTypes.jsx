@@ -5,6 +5,7 @@ import Modal from '../components/Modal';
 
 export default function EventTypes() {
   const [eventTypes, setEventTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -25,6 +26,8 @@ export default function EventTypes() {
         setEventTypes(data);
       } catch (error) {
         console.error('Failed to load event types:', error);
+      } finally {
+        setLoading(false);
       }
     };
     
@@ -157,24 +160,31 @@ export default function EventTypes() {
 
         {/* Event Cards */}
         <div className="space-y-2">
-          {filteredEventTypes.map((event) => (
-            <div
-              key={event.id}
-              className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 hover:border-zinc-700 transition-all"
-            >
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-1">
-                    <h3 className="text-base font-medium text-white truncate">{event.title}</h3>
-                    <div className="flex items-center gap-1 text-gray-400 text-sm flex-shrink-0">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span>{event.duration}m</span>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mb-4"></div>
+              <p className="text-gray-400">Loading event types...</p>
+            </div>
+          ) : (
+            <>
+              {filteredEventTypes.map((event) => (
+                <div
+                  key={event.id}
+                  className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 hover:border-zinc-700 transition-all"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-3 mb-1">
+                        <h3 className="text-base font-medium text-white truncate">{event.title}</h3>
+                        <div className="flex items-center gap-1 text-gray-400 text-sm flex-shrink-0">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span>{event.duration}m</span>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-400 truncate">/{event.slug}</p>
                     </div>
-                  </div>
-                  <p className="text-sm text-gray-400 truncate">/{event.slug}</p>
-                </div>
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2">
@@ -226,10 +236,12 @@ export default function EventTypes() {
             </div>
           ))}
 
-          {filteredEventTypes.length === 0 && (
+          {!loading && filteredEventTypes.length === 0 && (
             <div className="text-center py-12 text-gray-500">
               {searchQuery ? 'No results found' : 'No event types yet'}
             </div>
+          )}
+            </>
           )}
         </div>
       </div>

@@ -118,6 +118,9 @@ const getAvailableSlots = async (req, res) => {
     const duration = eventType.duration;
     const bufferTime = eventType.bufferTime || 0;
     
+    // Get current time in the specified timezone
+    const now = moment.tz(timezone || 'UTC');
+    
     for (const avail of availability) {
       const [startHour, startMinute] = avail.startTime.split(':').map(Number);
       const [endHour, endMinute] = avail.endTime.split(':').map(Number);
@@ -128,6 +131,18 @@ const getAvailableSlots = async (req, res) => {
       while (currentTime.clone().add(duration, 'minutes').isSameOrBefore(endTime)) {
         const slotStart = currentTime.format('HH:mm');
         const slotEnd = currentTime.clone().add(duration, 'minutes').format('HH:mm');
+        
+        // Skip past time slots - check if slot END time has already passed
+        const slotEndDateTime = selectedDate.clone().set({ 
+          hour: parseInt(slotEnd.split(':')[0]), 
+          minute: parseInt(slotEnd.split(':')[1]), 
+          second: 0 
+        });
+        
+        if (slotEndDateTime.isBefore(now)) {
+          currentTime.add(duration + bufferTime, 'minutes');
+          continue;
+        }
         
         const existingBooking = await prisma.booking.findFirst({
           where: {
@@ -141,7 +156,7 @@ const getAvailableSlots = async (req, res) => {
           }
         });
         
-        if (!existingBooking && currentTime.isAfter(moment.tz(timezone || 'UTC'))) {
+        if (!existingBooking) {
           slots.push({
             time: slotStart,
             endTime: slotEnd,

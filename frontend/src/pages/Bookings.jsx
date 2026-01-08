@@ -8,6 +8,7 @@ import TimeSlotPicker from '../components/TimeSlotPicker';
 
 export default function Bookings() {
   const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('upcoming');
   const [rescheduleModal, setRescheduleModal] = useState(null);
   const [cancelModal, setCancelModal] = useState(null);
@@ -18,11 +19,14 @@ export default function Bookings() {
 
   useEffect(() => {
     const loadBookings = async () => {
+      setLoading(true);
       try {
         const data = await api.bookings.getAll({ type: filter });
         setBookings(data);
       } catch (error) {
         console.error('Failed to load bookings:', error);
+      } finally {
+        setLoading(false);
       }
     };
     
@@ -140,7 +144,12 @@ export default function Bookings() {
 
         {/* Bookings List */}
         <div className="space-y-2">
-          {bookings.length === 0 ? (
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mb-4"></div>
+              <p className="text-gray-400">Loading bookings...</p>
+            </div>
+          ) : bookings.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               {filter === 'upcoming' 
                 ? 'No upcoming bookings'
