@@ -5,7 +5,6 @@ const { sendBookingConfirmation, sendCancellationEmail } = require('../services/
 const getAllBookings = async (req, res) => {
   try {
     const { status, type } = req.query;
-    const now = new Date();
     
     let whereClause = {};
     
@@ -13,12 +12,6 @@ const getAllBookings = async (req, res) => {
       whereClause.status = status;
     } else {
       whereClause.status = { not: 'cancelled' };
-    }
-    
-    if (type === 'upcoming') {
-      whereClause.date = { gte: now };
-    } else if (type === 'past') {
-      whereClause.date = { lt: now };
     }
     
     const bookings = await prisma.booking.findMany({
@@ -32,7 +25,20 @@ const getAllBookings = async (req, res) => {
       orderBy: { date: type === 'past' ? 'desc' : 'asc' }
     });
     
-    res.json(bookings);
+    // Filter bookings based on date AND time
+    const now = moment();
+    const filteredBookings = bookings.filter(booking => {
+      const bookingDateTime = moment(`${booking.date.toISOString().split('T')[0]} ${booking.endTime}`, 'YYYY-MM-DD HH:mm');
+      
+      if (type === 'upcoming') {
+        return bookingDateTime.isAfter(now);
+      } else if (type === 'past') {
+        return bookingDateTime.isBefore(now);
+      }
+      return true;
+    });
+    
+    res.json(filteredBookings);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

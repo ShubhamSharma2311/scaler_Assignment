@@ -17,6 +17,7 @@ export default function PublicBooking() {
     email: '',
     notes: ''
   });
+  const [questionAnswers, setQuestionAnswers] = useState({});
 
   useEffect(() => {
     const loadEventType = async () => {
@@ -77,6 +78,16 @@ export default function PublicBooking() {
     e.preventDefault();
     if (!selectedDate || !selectedSlot) return;
 
+    // Validate required custom questions
+    if (eventType.questions && eventType.questions.length > 0) {
+      for (const question of eventType.questions) {
+        if (question.required && !questionAnswers[question.id]) {
+          alert(`Please answer the required question: ${question.question}`);
+          return;
+        }
+      }
+    }
+
     try {
       const bookingData = {
         eventTypeId: eventType.id,
@@ -86,7 +97,11 @@ export default function PublicBooking() {
         startTime: selectedSlot.time,
         endTime: selectedSlot.endTime,
         timezone: 'UTC',
-        notes: formData.notes
+        notes: formData.notes,
+        answers: eventType.questions ? eventType.questions.map(q => ({
+          questionId: q.id,
+          answer: questionAnswers[q.id] || ''
+        })).filter(a => a.answer) : []
       };
 
       const result = await api.bookings.create(bookingData);
@@ -279,6 +294,36 @@ export default function PublicBooking() {
                         placeholder="Any additional information..."
                       />
                     </div>
+
+                    {eventType.questions && eventType.questions.length > 0 && (
+                      <div className="border-t pt-4 space-y-4">
+                        <h3 className="font-semibold text-gray-900">Additional Questions</h3>
+                        {eventType.questions.map((question) => (
+                          <div key={question.id}>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              {question.question} {question.required && <span className="text-red-500">*</span>}
+                            </label>
+                            {question.type === 'textarea' ? (
+                              <textarea
+                                required={question.required}
+                                value={questionAnswers[question.id] || ''}
+                                onChange={(e) => setQuestionAnswers({ ...questionAnswers, [question.id]: e.target.value })}
+                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                rows="3"
+                              />
+                            ) : (
+                              <input
+                                type={question.type === 'number' ? 'number' : 'text'}
+                                required={question.required}
+                                value={questionAnswers[question.id] || ''}
+                                onChange={(e) => setQuestionAnswers({ ...questionAnswers, [question.id]: e.target.value })}
+                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
 
                     <button
                       type="submit"

@@ -13,6 +13,7 @@ export default function EventTypes() {
     color: '#3b82f6',
     bufferTime: 0
   });
+  const [customQuestions, setCustomQuestions] = useState([]);
 
   useEffect(() => {
     const loadEventTypes = async () => {
@@ -39,14 +40,20 @@ export default function EventTypes() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const dataToSubmit = {
+        ...formData,
+        questions: customQuestions
+      };
+      
       if (editingEvent) {
-        await api.eventTypes.update(editingEvent.id, formData);
+        await api.eventTypes.update(editingEvent.id, dataToSubmit);
       } else {
-        await api.eventTypes.create(formData);
+        await api.eventTypes.create(dataToSubmit);
       }
       setShowModal(false);
       setEditingEvent(null);
       setFormData({ title: '', description: '', duration: 30, slug: '', color: '#3b82f6', bufferTime: 0 });
+      setCustomQuestions([]);
       loadEventTypes();
     } catch (error) {
       alert('Failed to save event type');
@@ -64,7 +71,22 @@ export default function EventTypes() {
       color: event.color || '#3b82f6',
       bufferTime: event.bufferTime || 0
     });
+    setCustomQuestions(event.questions || []);
     setShowModal(true);
+  };
+
+  const addQuestion = () => {
+    setCustomQuestions([...customQuestions, { question: '', type: 'text', required: false }]);
+  };
+
+  const updateQuestion = (index, field, value) => {
+    const updated = [...customQuestions];
+    updated[index][field] = value;
+    setCustomQuestions(updated);
+  };
+
+  const removeQuestion = (index) => {
+    setCustomQuestions(customQuestions.filter((_, i) => i !== index));
   };
 
   const handleDelete = async (id) => {
@@ -232,6 +254,70 @@ export default function EventTypes() {
                     className="w-20 h-10 border rounded cursor-pointer"
                   />
                 </div>
+              </div>
+
+              <div className="mt-6 pt-6 border-t">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Custom Questions</h3>
+                  <button
+                    type="button"
+                    onClick={addQuestion}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    + Add Question
+                  </button>
+                </div>
+                
+                {customQuestions.length === 0 ? (
+                  <p className="text-sm text-gray-500 italic">No custom questions added yet</p>
+                ) : (
+                  <div className="space-y-4">
+                    {customQuestions.map((q, index) => (
+                      <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex-1 mr-4">
+                            <input
+                              type="text"
+                              value={q.question}
+                              onChange={(e) => updateQuestion(index, 'question', e.target.value)}
+                              placeholder="Enter your question"
+                              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeQuestion(index)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                        <div className="flex items-center space-x-4">
+                          <select
+                            value={q.type}
+                            onChange={(e) => updateQuestion(index, 'type', e.target.value)}
+                            className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                          >
+                            <option value="text">Text</option>
+                            <option value="textarea">Long Text</option>
+                            <option value="number">Number</option>
+                          </select>
+                          <label className="flex items-center space-x-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={q.required}
+                              onChange={(e) => updateQuestion(index, 'required', e.target.checked)}
+                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                            <span className="text-sm text-gray-700">Required</span>
+                          </label>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end space-x-3 mt-6">
