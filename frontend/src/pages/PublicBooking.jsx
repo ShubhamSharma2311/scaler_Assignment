@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import moment from 'moment-timezone';
+import Calendar from '../components/Calendar';
+import TimeSlotPicker from '../components/TimeSlotPicker';
 
 export default function PublicBooking() {
   const { slug } = useParams();
@@ -12,6 +14,8 @@ export default function PublicBooking() {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [timeFormat, setTimeFormat] = useState('12h'); // '12h' or '24h'
+  const [showBookingForm, setShowBookingForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -54,24 +58,15 @@ export default function PublicBooking() {
     }
   }, [selectedDate, eventType, slug]);
 
-  const getDaysInMonth = () => {
-    const start = currentMonth.clone().startOf('month').startOf('week');
-    const end = currentMonth.clone().endOf('month').endOf('week');
-    const days = [];
-    let day = start.clone();
-
-    while (day.isSameOrBefore(end)) {
-      days.push(day.clone());
-      day.add(1, 'day');
-    }
-
-    return days;
-  };
-
   const handleDateSelect = (date) => {
-    if (date.isBefore(moment(), 'day')) return;
     setSelectedDate(date);
     setSelectedSlot(null);
+    setShowBookingForm(false);
+  };
+
+  const handleTimeSlotSelect = (slot) => {
+    setSelectedSlot(slot);
+    setShowBookingForm(true);
   };
 
   const handleSubmit = async (e) => {
@@ -112,231 +107,257 @@ export default function PublicBooking() {
     }
   };
 
+  const formatTimeSlot = (time) => {
+    if (timeFormat === '24h') {
+      return time;
+    }
+    return moment(time, 'HH:mm').format('h:mma');
+  };
+
   if (!eventType) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg text-gray-600">Loading...</div>
+      <div className="flex items-center justify-center min-h-screen bg-black">
+        <div className="text-lg text-gray-400">Loading...</div>
+      </div>
+    );
+  }
+
+  if (showBookingForm) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <div className="max-w-2xl mx-auto px-4 py-8">
+          <button
+            onClick={() => setShowBookingForm(false)}
+            className="flex items-center gap-2 text-gray-400 hover:text-white mb-6"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
+
+          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 mb-6">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center text-gray-300 font-semibold">
+                S
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold mb-1">{eventType.title}</h2>
+                <div className="flex items-center gap-4 text-sm text-gray-400">
+                  <div className="flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{eventType.duration}m</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <span>Cal Video</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="text-gray-300">
+              <p className="mb-2">{selectedDate.format('dddd, MMMM D, YYYY')}</p>
+              <p>{formatTimeSlot(selectedSlot.time)}</p>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Name *</label>
+              <input
+                type="text"
+                required
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:border-zinc-700 focus:outline-none"
+                placeholder="Your name"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Email *</label>
+              <input
+                type="email"
+                required
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:border-zinc-700 focus:outline-none"
+                placeholder="your@email.com"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Notes (Optional)</label>
+              <textarea
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:border-zinc-700 focus:outline-none"
+                rows="3"
+                placeholder="Any additional information..."
+              />
+            </div>
+
+            {eventType.questions && eventType.questions.length > 0 && (
+              <div className="border-t border-zinc-800 pt-4 space-y-4">
+                <h3 className="font-semibold text-white">Additional Questions</h3>
+                {eventType.questions.map((question) => (
+                  <div key={question.id}>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      {question.question} {question.required && <span className="text-red-500">*</span>}
+                    </label>
+                    {question.type === 'textarea' ? (
+                      <textarea
+                        required={question.required}
+                        value={questionAnswers[question.id] || ''}
+                        onChange={(e) => setQuestionAnswers({ ...questionAnswers, [question.id]: e.target.value })}
+                        className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:border-zinc-700 focus:outline-none"
+                        rows="3"
+                      />
+                    ) : (
+                      <input
+                        type={question.type === 'number' ? 'number' : 'text'}
+                        required={question.required}
+                        value={questionAnswers[question.id] || ''}
+                        onChange={(e) => setQuestionAnswers({ ...questionAnswers, [question.id]: e.target.value })}
+                        className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:border-zinc-700 focus:outline-none"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="w-full bg-white text-black py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+            >
+              Confirm Booking
+            </button>
+          </form>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow-sm border p-6 sm:p-8 mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:space-x-4 space-y-4 sm:space-y-0">
-            <div className="w-2 h-14 sm:h-20 rounded" style={{ backgroundColor: eventType.color }}></div>
-            <div className="space-y-3">
-              <h1 className="text-3xl font-bold text-gray-900 leading-tight">{eventType.title}</h1>
-              {eventType.description && (
-                <p className="text-gray-600">{eventType.description}</p>
-              )}
-              <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
-                <div className="flex items-center space-x-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>{eventType.duration} minutes</span>
-                </div>
-                {eventType.bufferTime > 0 && (
-                  <div className="flex items-center space-x-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    <span>{eventType.bufferTime} min buffer</span>
-                  </div>
-                )}
-              </div>
+    <div className="min-h-screen bg-black">
+      <div className="flex flex-col lg:flex-row max-w-7xl mx-auto">
+        {/* Left Sidebar */}
+        <div className="lg:w-80 bg-zinc-950 border-b lg:border-b-0 lg:border-r border-zinc-800 p-6 lg:p-8">
+          <div className="flex items-start gap-3 mb-6">
+            <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center text-gray-300 font-semibold flex-shrink-0">
+              S
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-gray-400 text-sm">Shubham Sharma</p>
+            </div>
+          </div>
+
+          <h1 className="text-2xl font-semibold text-white mb-3">{eventType.title}</h1>
+          
+          <div className="space-y-3 text-gray-400">
+            <div className="flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-sm">30m</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              <span className="text-sm">Cal Video</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-sm">Asia/Kolkata</span>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-          <div className="bg-white rounded-lg shadow-sm border p-5 sm:p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Select a Date</h2>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => setCurrentMonth(currentMonth.clone().subtract(1, 'month'))}
-                  className="p-2 hover:bg-gray-100 rounded-lg"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => setCurrentMonth(currentMonth.clone().add(1, 'month'))}
-                  className="p-2 hover:bg-gray-100 rounded-lg"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
+        {/* Center - Calendar */}
+        <div className="flex-1 p-6 lg:p-8">
+          <Calendar
+            currentMonth={currentMonth}
+            onMonthChange={setCurrentMonth}
+            selectedDate={selectedDate}
+            onDateSelect={handleDateSelect}
+            minDate={moment()}
+            className=""
+          />
+        </div>
+
+        {/* Right - Time Slots */}
+        <div className="lg:w-80 bg-zinc-950 border-t lg:border-t-0 lg:border-l border-zinc-800 p-6 lg:p-8">
+          {!selectedDate ? (
+            <div className="text-center py-12 text-gray-500">
+              <p>Select a date</p>
             </div>
-
-            <div className="text-center font-semibold text-gray-900 mb-4">
-              {currentMonth.format('MMMM YYYY')}
-            </div>
-
-            <div className="grid grid-cols-7 gap-1 mb-2">
-              {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
-                <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
-                  {day}
-                </div>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-7 gap-1">
-              {getDaysInMonth().map((day, index) => {
-                const isCurrentMonth = day.month() === currentMonth.month();
-                const isToday = day.isSame(moment(), 'day');
-                const isPast = day.isBefore(moment(), 'day');
-                const isSelected = selectedDate && day.isSame(selectedDate, 'day');
-
-                return (
+          ) : (
+            <>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-white font-medium">
+                  {selectedDate.format('ddd DD')}
+                </h3>
+                <div className="flex gap-1">
                   <button
-                    key={index}
-                    onClick={() => handleDateSelect(day)}
-                    disabled={isPast}
-                    className={`
-                      aspect-square p-2 text-sm rounded transition-colors
-                      ${!isCurrentMonth ? 'text-gray-300' : ''}
-                      ${isPast ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-gray-100'}
-                      ${isToday ? 'font-bold' : ''}
-                      ${isSelected ? 'bg-black text-white hover:bg-gray-800' : ''}
-                    `}
+                    onClick={() => setTimeFormat('12h')}
+                    className={`px-3 py-1 text-xs rounded ${
+                      timeFormat === '12h'
+                        ? 'bg-zinc-800 text-white'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
                   >
-                    {day.format('D')}
+                    12h
                   </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm border p-5 sm:p-6">
-            {!selectedDate ? (
-              <div className="text-center py-12">
-                <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <p className="text-gray-500">Select a date to see available times</p>
+                  <button
+                    onClick={() => setTimeFormat('24h')}
+                    className={`px-3 py-1 text-xs rounded ${
+                      timeFormat === '24h'
+                        ? 'bg-zinc-800 text-white'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    24h
+                  </button>
+                </div>
               </div>
-            ) : (
-              <>
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                  {selectedDate.format('dddd, MMMM D, YYYY')}
-                </h2>
 
-                {loading ? (
-                  <div className="text-center py-12">
-                    <div className="text-gray-500">Loading available times...</div>
-                  </div>
-                ) : availableSlots.length === 0 ? (
-                  <div className="text-center py-12">
-                    <p className="text-gray-500">No available times for this date</p>
-                  </div>
-                ) : (
-                  <div className="space-y-2 mb-6 max-h-64 sm:max-h-72 overflow-y-auto">
-                    {availableSlots.map((slot, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setSelectedSlot(slot)}
-                        className={`
-                          w-full p-3 text-left rounded-lg border transition-colors
-                          ${selectedSlot?.time === slot.time
-                            ? 'bg-black text-white border-black'
-                            : 'hover:border-gray-400 hover:bg-gray-50'
-                          }
-                        `}
-                      >
-                        {moment(slot.time, 'HH:mm').format('h:mm A')}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {selectedSlot && (
-                  <form onSubmit={handleSubmit} className="space-y-4 border-t pt-5 sm:pt-6">
-                    <h3 className="font-semibold text-gray-900">Enter Details</h3>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Your name"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                      <input
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="your@email.com"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Notes (Optional)</label>
-                      <textarea
-                        value={formData.notes}
-                        onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        rows="3"
-                        placeholder="Any additional information..."
-                      />
-                    </div>
-
-                    {eventType.questions && eventType.questions.length > 0 && (
-                      <div className="border-t pt-4 space-y-4">
-                        <h3 className="font-semibold text-gray-900">Additional Questions</h3>
-                        {eventType.questions.map((question) => (
-                          <div key={question.id}>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              {question.question} {question.required && <span className="text-red-500">*</span>}
-                            </label>
-                            {question.type === 'textarea' ? (
-                              <textarea
-                                required={question.required}
-                                value={questionAnswers[question.id] || ''}
-                                onChange={(e) => setQuestionAnswers({ ...questionAnswers, [question.id]: e.target.value })}
-                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                rows="3"
-                              />
-                            ) : (
-                              <input
-                                type={question.type === 'number' ? 'number' : 'text'}
-                                required={question.required}
-                                value={questionAnswers[question.id] || ''}
-                                onChange={(e) => setQuestionAnswers({ ...questionAnswers, [question.id]: e.target.value })}
-                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              />
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    <button
-                      type="submit"
-                      className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition-colors font-medium"
-                    >
-                      Confirm Booking
-                    </button>
-                  </form>
-                )}
-              </>
-            )}
-          </div>
+              {loading ? (
+                <div className="text-center py-12 text-gray-500">
+                  <p>Loading...</p>
+                </div>
+              ) : availableSlots.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  <p>No available times</p>
+                </div>
+              ) : (
+                <TimeSlotPicker
+                  slots={availableSlots}
+                  selectedSlot={selectedSlot}
+                  onSlotSelect={handleTimeSlotSelect}
+                  emptyMessage="No available times"
+                  timeFormat={timeFormat}
+                  showIndicator={true}
+                  loading={loading}
+                />
+              )}
+            </>
+          )}
         </div>
+      </div>
+
+      {/* Footer */}
+      <div className="text-center py-6 text-gray-500 border-t border-zinc-900">
+        <p className="text-sm">Cal.com</p>
       </div>
     </div>
   );

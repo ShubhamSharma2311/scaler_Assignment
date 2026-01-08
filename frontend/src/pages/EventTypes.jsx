@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import Modal from '../components/Modal';
 
 export default function EventTypes() {
   const [eventTypes, setEventTypes] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -107,99 +109,134 @@ export default function EventTypes() {
     alert('Link copied to clipboard!');
   };
 
-  return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Event Types</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">Create events to share for people to book on your calendar.</p>
-        </div>
-        <button
-          onClick={() => {
-            setEditingEvent(null);
-            setFormData({ title: '', description: '', duration: 30, slug: '', color: '#3b82f6', bufferTime: 0 });
-            setShowModal(true);
-          }}
-          className="bg-black text-white px-4 py-2 sm:px-6 rounded-lg hover:bg-gray-800 text-sm sm:text-base whitespace-nowrap self-start sm:self-auto"
-        >
-          + New Event Type
-        </button>
-      </div>
+  const filteredEventTypes = eventTypes.filter(event =>
+    event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    event.slug.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-      <div className="grid gap-3 sm:gap-4">
-        {eventTypes.map((event) => (
-          <div key={event.id} className="bg-white border rounded-lg p-4 sm:p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-start gap-3 sm:gap-4">
-              <div className="w-1 h-14 sm:h-16 rounded flex-shrink-0" style={{ backgroundColor: event.color }}></div>
-              <div className="min-w-0 flex-1">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 break-words">{event.title}</h3>
-                <p className="text-gray-600 text-xs sm:text-sm mt-1 break-words">{event.description}</p>
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs sm:text-sm text-gray-500">
-                  <span>{event.duration} min</span>
-                  {event.bufferTime > 0 && <span>Buffer: {event.bufferTime} min</span>}
-                  <span className="text-blue-600 break-all">/{event.slug}</span>
+  return (
+    <div className="min-h-screen bg-black text-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-semibold">Event Types</h1>
+            <p className="text-gray-400 text-sm mt-1">Create events to share for people to book on your calendar.</p>
+          </div>
+          <button
+            onClick={() => {
+              setEditingEvent(null);
+              setFormData({ title: '', description: '', duration: 30, slug: '', color: '#3b82f6', bufferTime: 0 });
+              setCustomQuestions([]);
+              setShowModal(true);
+            }}
+            className="bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 font-medium transition-colors flex items-center gap-2"
+          >
+            <span className="text-lg">+</span>
+            <span>New</span>
+          </button>
+        </div>
+
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative">
+            <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-zinc-700"
+            />
+          </div>
+        </div>
+
+        {/* Event Cards */}
+        <div className="space-y-2">
+          {filteredEventTypes.map((event) => (
+            <div
+              key={event.id}
+              className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 hover:border-zinc-700 transition-all"
+            >
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-1">
+                    <h3 className="text-base font-medium text-white truncate">{event.title}</h3>
+                    <div className="flex items-center gap-1 text-gray-400 text-sm flex-shrink-0">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>{event.duration}m</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-400 truncate">/{event.slug}</p>
                 </div>
-                <div className="flex items-center gap-2 mt-3 sm:hidden">
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2">
+                  {/* Preview Button */}
+                  <button
+                    onClick={() => window.open(`/book/${event.slug}`, '_blank')}
+                    className="p-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
+                    title="Preview"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </button>
+
+                  {/* Copy Link Button */}
                   <button
                     onClick={() => copyLink(event.slug)}
-                    className="flex-1 px-3 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                    className="p-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
+                    title="Copy link"
                   >
-                    Copy Link
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
                   </button>
+
+                  {/* Edit & Delete Menu Button */}
                   <button
                     onClick={() => handleEdit(event)}
-                    className="flex-1 px-3 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                    className="p-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
+                    title="Edit"
                   >
-                    Edit
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
                   </button>
+
+                  {/* Three Dots Menu */}
                   <button
                     onClick={() => handleDelete(event.id)}
-                    className="px-3 py-2 text-sm text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                    className="p-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
+                    title="More options"
                   >
-                    Delete
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                    </svg>
                   </button>
                 </div>
               </div>
-              <div className="hidden sm:flex items-start space-x-1 flex-shrink-0">
-                <button
-                  onClick={() => copyLink(event.slug)}
-                  className="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded"
-                  title="Copy link"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => handleEdit(event)}
-                  className="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded"
-                  title="Edit"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => handleDelete(event.id)}
-                  className="p-2 text-gray-600 hover:text-red-600 hover:bg-gray-100 rounded"
-                  title="Delete"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
-              </div>
             </div>
-          </div>
-        ))}
+          ))}
+
+          {filteredEventTypes.length === 0 && (
+            <div className="text-center py-12 text-gray-500">
+              {searchQuery ? 'No results found' : 'No event types yet'}
+            </div>
+          )}
+        </div>
       </div>
 
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-4 sm:p-6 lg:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold mb-6">
-              {editingEvent ? 'Edit Event Type' : 'Create New Event Type'}
-            </h2>
+      <Modal isOpen={showModal} maxWidth="max-w-2xl">
+        <div className="bg-white rounded-lg p-4 sm:p-6 lg:p-8 w-full">
+          <h2 className="text-2xl font-bold mb-6">
+            {editingEvent ? 'Edit Event Type' : 'Create New Event Type'}
+          </h2>
             <form onSubmit={handleSubmit}>
               <div className="space-y-4">
                 <div>
@@ -358,8 +395,7 @@ export default function EventTypes() {
               </div>
             </form>
           </div>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 }

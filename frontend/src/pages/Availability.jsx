@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import Modal from '../components/Modal';
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -81,13 +82,6 @@ export default function Availability() {
     });
   };
 
-  const removeTimeSlot = (day, index) => {
-    const newSlots = schedule[day].slots.filter((_, i) => i !== index);
-    setSchedule({
-      ...schedule,
-      [day]: { ...schedule[day], slots: newSlots.length > 0 ? newSlots : [{ startTime: '09:00', endTime: '17:00' }] }
-    });
-  };
 
   const handleSave = async () => {
     try {
@@ -140,171 +134,182 @@ export default function Availability() {
     }
   };
 
+  const formatTime12Hour = (time24) => {
+    if (!time24) return '';
+    const [hours, minutes] = time24.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${ampm}`;
+  };
+
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Availability</h1>
-        <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">Configure times when you are available for bookings.</p>
-      </div>
-
-      <div className="bg-white rounded-lg border p-4 sm:p-6 mb-4 sm:mb-6">
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
-          <select
-            value={timezone}
-            onChange={(e) => setTimezone(e.target.value)}
-            className="w-full max-w-xs px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="UTC">UTC</option>
-            <option value="America/New_York">America/New_York</option>
-            <option value="America/Chicago">America/Chicago</option>
-            <option value="America/Los_Angeles">America/Los_Angeles</option>
-            <option value="Europe/London">Europe/London</option>
-            <option value="Asia/Tokyo">Asia/Tokyo</option>
-            <option value="Asia/Kolkata">Asia/Kolkata</option>
-          </select>
-        </div>
-
-        <div className="space-y-4">
-          {DAYS.map((day, index) => (
-            <div key={index} className="border-b pb-4">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center space-x-3">
-                  <input
-                    type="checkbox"
-                    checked={schedule[index]?.enabled || false}
-                    onChange={() => toggleDay(index)}
-                    className="w-5 h-5 text-blue-600 rounded cursor-pointer"
-                  />
-                  <span className="text-sm font-medium text-gray-900 w-24">{day}</span>
-                </div>
-                {schedule[index]?.enabled && (
-                  <button
-                    onClick={() => addTimeSlot(index)}
-                    className="text-sm text-blue-600 hover:text-blue-800"
-                  >
-                    + Add time
-                  </button>
-                )}
-              </div>
-
-              {schedule[index]?.enabled && (
-                <div className="ml-8 space-y-2">
-                  {schedule[index].slots.map((slot, slotIndex) => (
-                    <div key={slotIndex} className="flex items-center space-x-2">
-                      <input
-                        type="time"
-                        value={slot.startTime}
-                        onChange={(e) => updateTimeSlot(index, slotIndex, 'startTime', e.target.value)}
-                        className="px-3 py-1.5 border rounded text-sm"
-                      />
-                      <span className="text-gray-500">-</span>
-                      <input
-                        type="time"
-                        value={slot.endTime}
-                        onChange={(e) => updateTimeSlot(index, slotIndex, 'endTime', e.target.value)}
-                        className="px-3 py-1.5 border rounded text-sm"
-                      />
-                      {schedule[index].slots.length > 1 && (
-                        <button
-                          onClick={() => removeTimeSlot(index, slotIndex)}
-                          className="text-red-600 hover:text-red-800 p-1"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-6 flex justify-end">
-          <button
-            onClick={handleSave}
-            className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800"
-          >
-            Save Changes
-          </button>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg border p-6">
-        <div className="flex justify-between items-center mb-4">
+    <div className="min-h-screen bg-black text-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Date Overrides</h2>
-            <p className="text-sm text-gray-600 mt-1">Add dates when your availability changes from your daily hours</p>
+            <h1 className="text-2xl font-semibold">Availability</h1>
+            <p className="text-gray-400 text-sm">Configure times when you are available for bookings.</p>
           </div>
           <button
-            onClick={() => setShowOverrideModal(true)}
-            className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800"
+            onClick={handleSave}
+            className="px-6 py-2 bg-white text-black rounded-lg hover:bg-gray-200 font-medium transition-colors"
           >
-            + Add Override
+            Save
           </button>
         </div>
 
-        <div className="space-y-2">
-          {dateOverrides.map((override) => (
-            <div key={override.id} className="p-3 border rounded-lg">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div>
-                  <div className="font-medium">
-                    {new Date(override.date).toLocaleDateString('en-US', { 
-                      weekday: 'short', 
-                      year: 'numeric', 
-                      month: 'short', 
-                      day: 'numeric' 
-                    })}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {override.isBlocked ? (
-                      <span className="text-red-600">Blocked</span>
-                    ) : (
-                      <span>{override.startTime} - {override.endTime}</span>
+        {/* Main Content */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Schedule Section */}
+          <div className="space-y-3">
+              {DAYS.map((day, index) => (
+                <div key={index} className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => toggleDay(index)}
+                        className={`w-11 h-6 rounded-full relative transition-colors ${
+                          schedule[index]?.enabled ? 'bg-white' : 'bg-zinc-700'
+                        }`}
+                      >
+                        <div
+                          className={`w-5 h-5 rounded-full absolute top-0.5 transition-all ${
+                            schedule[index]?.enabled
+                              ? 'right-0.5 bg-black'
+                              : 'left-0.5 bg-zinc-500'
+                          }`}
+                        ></div>
+                      </button>
+                      <span className="text-white font-medium">{day}</span>
+                    </div>
+                    {schedule[index]?.enabled && (
+                      <div className="flex items-center gap-2">
+                        {schedule[index].slots.map((slot, slotIndex) => (
+                          <div key={slotIndex} className="flex items-center gap-2">
+                            <input
+                              type="time"
+                              value={slot.startTime}
+                              onChange={(e) => updateTimeSlot(index, slotIndex, 'startTime', e.target.value)}
+                              className="px-3 py-2 bg-black border border-zinc-800 rounded-lg text-white text-sm focus:border-zinc-700 focus:outline-none"
+                            />
+                            <span className="text-gray-400">-</span>
+                            <input
+                              type="time"
+                              value={slot.endTime}
+                              onChange={(e) => updateTimeSlot(index, slotIndex, 'endTime', e.target.value)}
+                              className="px-3 py-2 bg-black border border-zinc-800 rounded-lg text-white text-sm focus:border-zinc-700 focus:outline-none"
+                            />
+                            <button
+                              onClick={() => addTimeSlot(index)}
+                              className="p-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                              </svg>
+                            </button>
+                            <button
+                              className="p-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                              </svg>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
                 </div>
-                <button
-                  onClick={() => handleDeleteOverride(override.id)}
-                  className="hidden sm:block text-red-600 hover:text-red-800 p-1"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
-              </div>
-              <button
-                onClick={() => handleDeleteOverride(override.id)}
-                className="sm:hidden w-full mt-2 px-3 py-2 text-sm text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
-              >
-                Delete Override
-              </button>
+              ))}
             </div>
-          ))}
-          {dateOverrides.length === 0 && (
-            <p className="text-gray-500 text-center py-4">No date overrides added yet</p>
-          )}
+
+            {/* Right Section */}
+            <div className="space-y-6">
+              {/* Timezone */}
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Timezone</label>
+                <select
+                  value={timezone}
+                  onChange={(e) => setTimezone(e.target.value)}
+                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:border-zinc-700 focus:outline-none"
+                >
+                  <option value="UTC">UTC</option>
+                  <option value="America/New_York">America/New_York</option>
+                  <option value="America/Chicago">America/Chicago</option>
+                  <option value="America/Los_Angeles">America/Los_Angeles</option>
+                  <option value="Europe/London">Europe/London</option>
+                  <option value="Asia/Tokyo">Asia/Tokyo</option>
+                  <option value="Asia/Kolkata">Asia/Kolkata</option>
+                </select>
+              </div>
+
+              {/* Date Overrides */}
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-3">Date Overrides</h3>
+                <button
+                  onClick={() => setShowOverrideModal(true)}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg text-gray-400 hover:text-white hover:border-zinc-700 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add an override
+                </button>
+
+                {dateOverrides.length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    {dateOverrides.map((override) => (
+                  <div key={override.id} className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex items-center justify-between">
+                    <div>
+                      <div className="text-white font-medium">
+                        {new Date(override.date).toLocaleDateString('en-US', { 
+                          weekday: 'short', 
+                          year: 'numeric', 
+                          month: 'short', 
+                          day: 'numeric' 
+                        })}
+                      </div>
+                      <div className="text-gray-400 text-sm">
+                        {override.isBlocked ? (
+                          <span className="text-red-500">Blocked</span>
+                        ) : (
+                          <span>{formatTime12Hour(override.startTime)} - {formatTime12Hour(override.endTime)}</span>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteOverride(override.id)}
+                      className="p-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
+    </div>
 
-      {showOverrideModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
-            <h2 className="text-2xl font-bold mb-6">Add Date Override</h2>
+      {/* Override Modal */}
+      <Modal isOpen={showOverrideModal}>
+        <div className="p-8">
+          <h2 className="text-2xl font-bold text-white mb-6">Add Date Override</h2>
             <form onSubmit={handleAddOverride}>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Date *</label>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Date *</label>
                   <input
                     type="date"
                     required
                     value={overrideData.date}
                     onChange={(e) => setOverrideData({ ...overrideData, date: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white focus:border-zinc-700 focus:outline-none"
                   />
                 </div>
 
@@ -314,30 +319,30 @@ export default function Availability() {
                       type="checkbox"
                       checked={overrideData.isBlocked}
                       onChange={(e) => setOverrideData({ ...overrideData, isBlocked: e.target.checked })}
-                      className="w-4 h-4 text-blue-600 rounded"
+                      className="w-4 h-4 rounded bg-zinc-800 border-zinc-700"
                     />
-                    <span className="text-sm font-medium text-gray-700">Block this date (unavailable)</span>
+                    <span className="text-sm font-medium text-gray-400">Block this date (unavailable)</span>
                   </label>
                 </div>
 
                 {!overrideData.isBlocked && (
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                      <label className="block text-sm font-medium text-gray-400 mb-2">Start Time</label>
                       <input
                         type="time"
                         value={overrideData.startTime}
                         onChange={(e) => setOverrideData({ ...overrideData, startTime: e.target.value })}
-                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white focus:border-zinc-700 focus:outline-none"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+                      <label className="block text-sm font-medium text-gray-400 mb-2">End Time</label>
                       <input
                         type="time"
                         value={overrideData.endTime}
                         onChange={(e) => setOverrideData({ ...overrideData, endTime: e.target.value })}
-                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white focus:border-zinc-700 focus:outline-none"
                       />
                     </div>
                   </div>
@@ -351,21 +356,20 @@ export default function Availability() {
                     setShowOverrideModal(false);
                     setOverrideData({ date: '', isBlocked: false, startTime: '09:00', endTime: '17:00' });
                   }}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                  className="px-4 py-2 text-gray-400 bg-zinc-800 rounded-lg hover:bg-zinc-700"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
+                  className="px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 font-medium"
                 >
                   Add Override
                 </button>
               </div>
             </form>
-          </div>
         </div>
-      )}
+      </Modal>
     </div>
   );
 }

@@ -23,11 +23,11 @@ function Dashboard() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-black">
       {/* Mobile Menu Button */}
       <button
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-gray-900 text-white rounded-md"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-zinc-800 text-white rounded-md"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           {mobileMenuOpen ? (
@@ -41,32 +41,53 @@ function Dashboard() {
       {/* Sidebar */}
       <aside className={`
         fixed lg:static inset-y-0 left-0 z-40
-        w-64 bg-gray-900 text-white transform transition-transform duration-300 ease-in-out
+        w-64 bg-zinc-900 border-r border-zinc-800 text-white transform transition-transform duration-300 ease-in-out
         ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="p-6">
-          <h1 className="text-lg sm:text-xl font-bold">Scheduling Platform</h1>
+          <h1 className="text-lg sm:text-xl font-semibold">Cal Clone</h1>
         </div>
         <nav className="mt-6">
           <Link
             to="/"
             onClick={() => setMobileMenuOpen(false)}
-            className={`flex items-center px-6 py-3 ${location.pathname === '/' ? 'bg-gray-800' : 'hover:bg-gray-800'}`}
+            className={`flex items-center px-6 py-3 transition-colors ${
+              location.pathname === '/' 
+                ? 'bg-zinc-800 text-white border-l-2 border-white' 
+                : 'text-gray-400 hover:bg-zinc-800 hover:text-white'
+            }`}
           >
+            <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+            </svg>
             <span>Event Types</span>
           </Link>
           <Link
             to="/bookings"
             onClick={() => setMobileMenuOpen(false)}
-            className={`flex items-center px-6 py-3 ${location.pathname === '/bookings' ? 'bg-gray-800' : 'hover:bg-gray-800'}`}
+            className={`flex items-center px-6 py-3 transition-colors ${
+              location.pathname === '/bookings' 
+                ? 'bg-zinc-800 text-white border-l-2 border-white' 
+                : 'text-gray-400 hover:bg-zinc-800 hover:text-white'
+            }`}
           >
+            <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
             <span>Bookings</span>
           </Link>
           <Link
             to="/availability"
             onClick={() => setMobileMenuOpen(false)}
-            className={`flex items-center px-6 py-3 ${location.pathname === '/availability' ? 'bg-gray-800' : 'hover:bg-gray-800'}`}
+            className={`flex items-center px-6 py-3 transition-colors ${
+              location.pathname === '/availability' 
+                ? 'bg-zinc-800 text-white border-l-2 border-white' 
+                : 'text-gray-400 hover:bg-zinc-800 hover:text-white'
+            }`}
           >
+            <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
             <span>Availability</span>
           </Link>
         </nav>
