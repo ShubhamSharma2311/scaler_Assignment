@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+// Replace this URL with your actual Render backend URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://your-backend.onrender.com/api';
 
 export const api = {
   eventTypes: {
