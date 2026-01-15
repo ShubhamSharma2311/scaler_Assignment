@@ -123,6 +123,20 @@ export default function BookingConfirmation() {
                 <p className="text-white">{booking.notes}</p>
               </div>
             )}
+
+            {booking.answers && booking.answers.length > 0 && (
+              <div>
+                <h2 className="text-sm font-medium text-gray-500 mb-2">Additional Information</h2>
+                <div className="space-y-3">
+                  {booking.answers.map((ans) => (
+                    <div key={ans.id} className="bg-zinc-800 rounded-lg p-3">
+                      <p className="text-sm font-medium text-gray-400 mb-1">{ans.question.question}</p>
+                      <p className="text-white">{ans.answer}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="mt-8 space-y-3">

@@ -183,6 +183,24 @@ export default function Bookings() {
                       </svg>
                       <span>You and {booking.name}</span>
                     </div>
+                    {booking.notes && (
+                      <p className="text-gray-400 text-sm mt-2">
+                        <span className="font-medium">Notes:</span> {booking.notes}
+                      </p>
+                    )}
+                    {booking.answers && booking.answers.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-zinc-800">
+                        <p className="text-xs font-medium text-gray-400 mb-2">Additional Information:</p>
+                        <div className="space-y-1.5">
+                          {booking.answers.map((ans) => (
+                            <div key={ans.id} className="text-sm">
+                              <span className="text-gray-500">{ans.question.question}:</span>
+                              <span className="text-white ml-2">{ans.answer}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Action Buttons */}
