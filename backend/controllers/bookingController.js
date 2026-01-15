@@ -82,15 +82,20 @@ const getAvailableSlots = async (req, res) => {
     const selectedDate = moment.tz(date, timezone || 'UTC');
     const dayOfWeek = selectedDate.day();
     
+    // Check for date overrides - clone to avoid mutation
+    const dateStart = selectedDate.clone().startOf('day');
+    const dateEnd = selectedDate.clone().endOf('day');
+    
     const dateOverride = await prisma.dateOverride.findFirst({
       where: {
         date: {
-          gte: selectedDate.startOf('day').toDate(),
-          lt: selectedDate.endOf('day').toDate()
+          gte: dateStart.toDate(),
+          lt: dateEnd.toDate()
         }
       }
     });
     
+    // If date is blocked, return empty slots immediately
     if (dateOverride && dateOverride.isBlocked) {
       return res.json({ slots: [] });
     }
