@@ -1,5 +1,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://scaler-assignment-0zpl.onrender.com/api';
 
+
+
 export const api = {
   eventTypes: {
     getAll: () => fetch(`${API_BASE_URL}/event-types`).then(res => res.json()),

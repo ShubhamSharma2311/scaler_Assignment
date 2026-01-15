@@ -78,7 +78,8 @@ const updateEventType = async (req, res) => {
       }
     }
 
-    if (questions) {
+    // Delete existing questions if questions array is provided (even if empty)
+    if (questions !== undefined) {
       await prisma.customQuestion.deleteMany({
         where: { eventTypeId: parseInt(id) }
       });
@@ -93,8 +94,13 @@ const updateEventType = async (req, res) => {
         slug,
         color,
         bufferTime,
-        questions: questions ? {
-          create: questions
+        questions: questions && questions.length > 0 ? {
+          create: questions.map(q => ({
+            question: q.question,
+            type: q.type,
+            required: q.required,
+            options: q.options
+          }))
         } : undefined
       },
       include: { questions: true }

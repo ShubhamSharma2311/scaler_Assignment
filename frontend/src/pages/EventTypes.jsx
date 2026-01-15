@@ -9,6 +9,7 @@ export default function EventTypes() {
   const [showModal, setShowModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [expandedEventId, setExpandedEventId] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -77,8 +78,20 @@ export default function EventTypes() {
       color: event.color || '#3b82f6',
       bufferTime: event.bufferTime || 0
     });
-    setCustomQuestions(event.questions || []);
+    // Strip database fields to prevent Prisma creation errors
+    setCustomQuestions(
+      (event.questions || []).map(q => ({
+        question: q.question,
+        type: q.type,
+        required: q.required,
+        options: q.options
+      }))
+    );
     setShowModal(true);
+  };
+
+  const toggleExpand = (eventId) => {
+    setExpandedEventId(expandedEventId === eventId ? null : eventId);
   };
 
   const addQuestion = () => {
@@ -170,10 +183,13 @@ export default function EventTypes() {
               {filteredEventTypes.map((event) => (
                 <div
                   key={event.id}
-                  className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 hover:border-zinc-700 transition-all"
+                  className="bg-zinc-900 border border-zinc-800 rounded-lg hover:border-zinc-700 transition-all"
                 >
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-4 p-4">
+                    <div 
+                      className="flex-1 min-w-0 cursor-pointer"
+                      onClick={() => toggleExpand(event.id)}
+                    >
                       <div className="flex items-center gap-3 mb-1">
                         <h3 className="text-base font-medium text-white truncate">{event.title}</h3>
                         <div className="flex items-center gap-1 text-gray-400 text-sm flex-shrink-0">
@@ -183,14 +199,46 @@ export default function EventTypes() {
                           <span>{event.duration}m</span>
                         </div>
                       </div>
-                      <p className="text-sm text-gray-400 truncate">/{event.slug}</p>
+                      <div className="flex items-center gap-3 text-sm text-gray-400">
+                        <span className="truncate">/{event.slug}</span>
+                        {event._count?.bookings > 0 && (
+                          <span className="flex items-center gap-1 flex-shrink-0">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            {event._count.bookings}
+                          </span>
+                        )}
+                        {event.questions?.length > 0 && (
+                          <span className="flex items-center gap-1 flex-shrink-0">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {event.questions.length}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2">
+                  {/* Expand/Collapse Button */}
+                  <button
+                    onClick={() => toggleExpand(event.id)}
+                    className="p-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
+                    title={expandedEventId === event.id ? "Collapse" : "Expand"}
+                  >
+                    <svg className={`w-5 h-5 transition-transform ${expandedEventId === event.id ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
                   {/* Preview Button */}
                   <button
-                    onClick={() => window.open(`/book/${event.slug}`, '_blank')}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(`/book/${event.slug}`, '_blank');
+                    }}
                     className="p-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
                     title="Preview"
                   >
@@ -201,7 +249,10 @@ export default function EventTypes() {
 
                   {/* Copy Link Button */}
                   <button
-                    onClick={() => copyLink(event.slug)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      copyLink(event.slug);
+                    }}
                     className="p-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
                     title="Copy link"
                   >
@@ -210,9 +261,12 @@ export default function EventTypes() {
                     </svg>
                   </button>
 
-                  {/* Edit & Delete Menu Button */}
+                  {/* Edit Button */}
                   <button
-                    onClick={() => handleEdit(event)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEdit(event);
+                    }}
                     className="p-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
                     title="Edit"
                   >
@@ -223,7 +277,10 @@ export default function EventTypes() {
 
                   {/* Delete Button */}
                   <button
-                    onClick={() => handleDelete(event.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(event.id);
+                    }}
                     className="p-2 text-gray-400 hover:text-red-400 hover:bg-zinc-800 rounded-lg transition-colors"
                     title="Delete"
                   >
@@ -233,6 +290,76 @@ export default function EventTypes() {
                   </button>
                 </div>
               </div>
+
+              {/* Expanded Details */}
+              {expandedEventId === event.id && (
+                <div className="px-4 pb-4 pt-3 border-t border-zinc-800 space-y-3">
+                  {event.description && (
+                    <div>
+                      <p className="text-xs font-medium text-gray-400 mb-1">Description</p>
+                      <p className="text-sm text-gray-300">{event.description}</p>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs font-medium text-gray-400 mb-1">Duration</p>
+                      <p className="text-sm text-white">{event.duration} minutes</p>
+                    </div>
+                    {event.bufferTime > 0 && (
+                      <div>
+                        <p className="text-xs font-medium text-gray-400 mb-1">Buffer Time</p>
+                        <p className="text-sm text-white">{event.bufferTime} minutes</p>
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-xs font-medium text-gray-400 mb-1">Color</p>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded" style={{ backgroundColor: event.color || '#3b82f6' }}></div>
+                        <p className="text-sm text-white">{event.color || '#3b82f6'}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-gray-400 mb-1">Total Bookings</p>
+                      <p className="text-sm text-white">{event._count?.bookings || 0}</p>
+                    </div>
+                  </div>
+
+                  {event.questions && event.questions.length > 0 && (
+                    <div>
+                      <p className="text-xs font-medium text-gray-400 mb-2">Custom Questions ({event.questions.length})</p>
+                      <div className="space-y-2">
+                        {event.questions.map((q, idx) => (
+                          <div key={q.id || idx} className="bg-black border border-zinc-800 rounded-lg p-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="text-sm text-white flex-1">{q.question}</p>
+                              <div className="flex items-center gap-2 flex-shrink-0">
+                                <span className="text-xs text-gray-400 bg-zinc-800 px-2 py-0.5 rounded">{q.type}</span>
+                                {q.required && (
+                                  <span className="text-xs text-red-400 bg-red-950/30 px-2 py-0.5 rounded">Required</span>
+                                )}
+                              </div>
+                            </div>
+                            {q.options && (
+                              <p className="text-xs text-gray-500 mt-1">Options: {q.options}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-2 pt-2">
+                    <span className="text-xs text-gray-500">Created: {new Date(event.createdAt).toLocaleDateString()}</span>
+                    {event.updatedAt !== event.createdAt && (
+                      <>
+                        <span className="text-gray-700">•</span>
+                        <span className="text-xs text-gray-500">Updated: {new Date(event.updatedAt).toLocaleDateString()}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           ))}
 
